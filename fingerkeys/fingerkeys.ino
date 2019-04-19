@@ -20,19 +20,57 @@ void setup() {
 typedef uint8_t keyMdfyers;
 #define left_shiftkey 0x2
 
+bool sendKeystroke_inRange( char c, char rbgn, char rend
+                          , uint8_t tgtbgn, keyMdfyers mdfy=0 ) {
+  if (c>=rbgn && c<=rend) {
+    uint8_t buf[8] = {mdfy,0,tgtbgn+(c-rbgn),0,0,0,0};
+    Serial.write(buf, 8);
+    buf[2] = 0;
+    Serial.write(buf, 8);
+    return true;
+  }
+  return false;
+}
+
+bool sendKeystroke_inRange( char c, char rbgn, char rend
+                           , const uint8_t* tgts, const uint8_t* mdfyers ) {
+  if (c>=rbgn && c<=rend) {
+    uint8_t buf[8] = {mdfyers[c-rbgn],0,tgts[c-rbgn],0,0,0,0};
+    Serial.write(buf, 8);
+    buf[2] = 0;
+    Serial.write(buf, 8);
+    return true;
+  }
+  return false;
+}
+
 void sendKeystroke(char c, keyMdfyers mdfy=0) {
 #ifdef SERIALCONSOLE_DEBUG
   char buf[2] = {c,0};
   Serial.print(buf);
 #else
-  if (c>='a' && c<='z') {
-    uint8_t buf[8] = {mdfy,0,4+(c-'a'),0,0,0,0};
-    Serial.write(buf, 8);
-    buf[2] = 0;
-    Serial.write(buf, 8);
-  } else if (c>='A' && c<='Z') {
-    sendKeystroke(c-'A'+'a', left_shiftkey);
-  }
+ if (sendKeystroke_inRange(c, 'a','z', 0x4               )
+  || sendKeystroke_inRange(c, 'A','Z', 0x4, left_shiftkey)
+  || sendKeystroke_inRange(c, '1','9', 0x1e              )
+  || sendKeystroke_inRange(c, '0','0', 0x27              ))
+   return;
+ uint8_t buf[8] = {0};
+ if (sendKeystroke_inRange(c, '\t','\n'
+           , (const uint8_t[]){0x2b, 0x28}
+           , (const uint8_t[]){0x0 , 0x0 })
+  || sendKeystroke_inRange(c, ' ','/'
+           , (const uint8_t[]){44,30,52,32,50,33,34,36,52,38,39,37,46,54,45,55,56}
+           , (const uint8_t[]){ 0, 2, 0, 2, 0, 2, 2, 2, 0, 2, 2, 2, 2, 0, 0, 0, 0})
+  || sendKeystroke_inRange(c, ':','@'
+           , (const uint8_t[]){51,51,54,46,55,56,31}
+           , (const uint8_t[]){ 2, 0, 2, 0, 2, 2, 2})
+  || sendKeystroke_inRange(c, '[','`'
+           , (const uint8_t[]){47,49,48,35,45,53}
+           , (const uint8_t[]){ 0, 0, 0, 2, 2, 0})
+  || sendKeystroke_inRange(c, '{','\b'
+           , (const uint8_t[]){47,49,48,50,42}
+           , (const uint8_t[]){ 2, 2, 2, 2, 0}))
+   return;
 #endif
 }
 
