@@ -6,7 +6,7 @@ dfuprogrammercmd="sudo dfu-programmer atmega16u2"
 
 function chfirmware() {
     $dfuprogrammercmd erase
-    $dfuprogrammercmd ${firmwares}/$1.hex
+    $dfuprogrammercmd flash ${firmwares}/$1.hex
     $dfuprogrammercmd reset
 }
 
