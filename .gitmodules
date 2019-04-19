@@ -1,0 +1,3 @@
+[submodule "USBKeyboard"]
+	path = USBKeyboard
+	url = https://github.com/coopermaa/USBKeyboard.git
