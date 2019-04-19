@@ -1,5 +1,7 @@
 #include "stdio.h"
 
+#define SERIALCONSOLE_DEBUG
+
 void setup() {
   pinMode(4, OUTPUT);
   pinMode(7, OUTPUT);
@@ -16,8 +18,17 @@ void setup() {
 #define pinky  0x10
 
 void sendKeystroke(char c) {
-  uint8_t buf[8] = {0,0,c,0,0,0,0};
-  Serial.write(buf, 8);
+#ifdef SERIALCONSOLE_DEBUG
+  char buf[2] = {c,0};
+  Serial.print(buf);
+#else
+  if (c>='a' && c<='z') {
+    uint8_t buf[8] = {0,0,4+(c-'a'),0,0,0,0};
+    Serial.write(buf, 8);
+    buf[2] = 0;
+    Serial.write(buf, 8);
+  }
+#endif
 }
 
 void loop() {
@@ -133,7 +144,7 @@ void loop() {
     sendKeystroke(state&middle?'M': 'm');
     sendKeystroke(state&ring ? 'R': 'r');
     sendKeystroke(state&pinky? 'P': 'p');
-    Serial.print("\n");
+    sendKeystroke('\n');
   }
   delay(1);
 }
