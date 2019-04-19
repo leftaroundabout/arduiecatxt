@@ -15,6 +15,11 @@ void setup() {
 #define ring   0x08
 #define pinky  0x10
 
+void sendKeystroke(char c) {
+  char buf[2] = {c, 0};
+  Serial.print(buf);
+}
+
 void loop() {
 
   // In one iteration check thumb and index, otherwise the other fingers.
@@ -123,15 +128,12 @@ void loop() {
 
   // If something has changed, print to terminal.
   if (state != oldstate) {
-    char printbuf[32];
-    sprintf( printbuf, "%s %s %s %s %s"
-           , state&thumb? "THUMB": "thumb"
-           , state&index? "INDEX": "index"
-           , state&middle?"MIDDLE":"middle"
-           , state&ring ? "RING" : "ring"
-           , state&pinky? "PINKY": "pinky"
-           );
-    Serial.println(printbuf);
+    sendKeystroke(state&thumb? 'T': 't');
+    sendKeystroke(state&index? 'I': 'i');
+    sendKeystroke(state&middle?'M': 'm');
+    sendKeystroke(state&ring ? 'R': 'r');
+    sendKeystroke(state&pinky? 'P': 'p');
+    Serial.print("\n");
   }
   delay(1);
 }
