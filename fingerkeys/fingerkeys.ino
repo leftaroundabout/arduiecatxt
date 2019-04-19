@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-#define SERIALCONSOLE_DEBUG
+// #define SERIALCONSOLE_DEBUG
 
 void setup() {
   pinMode(4, OUTPUT);
@@ -17,16 +17,21 @@ void setup() {
 #define ring   0x08
 #define pinky  0x10
 
-void sendKeystroke(char c) {
+typedef uint8_t keyMdfyers;
+#define left_shiftkey 0x2
+
+void sendKeystroke(char c, keyMdfyers mdfy=0) {
 #ifdef SERIALCONSOLE_DEBUG
   char buf[2] = {c,0};
   Serial.print(buf);
 #else
   if (c>='a' && c<='z') {
-    uint8_t buf[8] = {0,0,4+(c-'a'),0,0,0,0};
+    uint8_t buf[8] = {mdfy,0,4+(c-'a'),0,0,0,0};
     Serial.write(buf, 8);
     buf[2] = 0;
     Serial.write(buf, 8);
+  } else if (c>='A' && c<='Z') {
+    sendKeystroke(c-'A'+'a', left_shiftkey);
   }
 #endif
 }
