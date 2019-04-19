@@ -16,8 +16,8 @@ void setup() {
 #define pinky  0x10
 
 void sendKeystroke(char c) {
-  char buf[2] = {c, 0};
-  Serial.print(buf);
+  uint8_t buf[8] = {0,0,c,0,0,0,0};
+  Serial.write(buf, 8);
 }
 
 void loop() {
